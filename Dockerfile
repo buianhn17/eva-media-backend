@@ -4,13 +4,16 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
+COPY tsconfig*.json ./
+COPY src ./src
 
 RUN npm install
 
-COPY . .
-
 RUN npx prisma generate
+
 RUN npm run build
+
+RUN ls -la /app/dist || echo "DIST FOLDER MISSING!"
 
 EXPOSE 3000
 
