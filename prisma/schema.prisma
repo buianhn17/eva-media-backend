@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////////
+//////////////////// ENUM /////////////////////////////
+//////////////////////////////////////////////////////
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+//////////////////////////////////////////////////////
+//////////////////// USER /////////////////////////////
+//////////////////////////////////////////////////////
+
+model User {
+  id        Int      @id @default(autoincrement())
+
+  email     String   @unique
+  password  String
+
+  role      Role     @default(ADMIN)
+
+  createdAt DateTime @default(now())
+}
+
+//////////////////////////////////////////////////////
+//////////////////// DIRECTOR ////////////////////////
+//////////////////////////////////////////////////////
+
+model Director {
+  id        Int      @id @default(autoincrement())
+
+  name      String
+  slug      String   @unique   // SEO URL
+
+  avatar    String?
+  bio       String?
+
+  programs  Program[]
+
+  createdAt DateTime @default(now())
+
+  @@index([slug])
+}
+
+//////////////////////////////////////////////////////
+//////////////////// LOCATION ////////////////////////
+//////////////////////////////////////////////////////
+
+model Location {
+  id        Int      @id @default(autoincrement())
+
+  name      String
+  address   String?
+  city      String?
+
+  programs  Program[]
+}
+
+//////////////////////////////////////////////////////
+//////////////////// PROGRAM /////////////////////////
+//////////////////////////////////////////////////////
+
+model Program {
+  id          Int      @id @default(autoincrement())
+
+  title       String
+  slug        String   @unique
+  content     String
+
+  thumbnail   String?
+  videoUrl        String?
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
+  directorId  Int
+  director    Director @relation(fields: [directorId], references: [id])
+
+  locationId  Int
+  location    Location @relation(fields: [locationId], references: [id])
+
+  images      Image[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([directorId])
+  @@index([locationId])
+  @@index([createdAt])
+}
+
+//////////////////////////////////////////////////////
+//////////////////// IMAGE ///////////////////////////
+//////////////////////////////////////////////////////
+
+model Image {
+  id        Int     @id @default(autoincrement())
+
+  url       String
+
+  programId Int
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
