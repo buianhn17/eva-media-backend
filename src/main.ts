@@ -7,6 +7,8 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
+  app.setGlobalPrefix('api'); // ✅ FIX
+
   /* VALIDATION */
   app.useGlobalPipes(
     new ValidationPipe({
@@ -36,9 +38,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  /* PORT – Railway tự inject process.env.PORT */
   await app.listen(process.env.PORT || 3000);
-
 }
 
 bootstrap();
